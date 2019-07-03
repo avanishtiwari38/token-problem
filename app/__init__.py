@@ -7,7 +7,7 @@ from flask_restful import Api
 from flask import Blueprint
 
 # from app.config.celery_config import make_celery, Config
-# from app.config.base_config import Config
+from app.config.local_config import Config
 from .models import *
 
 dictConfig({
@@ -18,12 +18,12 @@ dictConfig({
     'handlers':
         {'file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/www/html/token_problem/token_problem/token_problem-app.log',
+            'filename': '/var/www/html/token_problem/token-problem/token_problem-app.log',
             'formatter': 'default'
         },
         'celery-file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/www/html/token_problem/token_problem/celery-tasks.log',
+            'filename': '/var/www/html/token_problem/token-problem/celery-tasks.log',
             'formatter': 'default'
             }},
     'root': {
@@ -39,7 +39,7 @@ dictConfig({
 # flask app config
 flask_app = Flask(__name__, instance_relative_config=True)
 
-# flask_app.config.from_object(Config)
+flask_app.config.from_object(Config)
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
