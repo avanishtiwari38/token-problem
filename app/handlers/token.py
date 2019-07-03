@@ -2,6 +2,10 @@ import logging
 import datetime
 import time
 
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import DataError
+from marshmallow import ValidationError
+
 from flask_restful import Resource
 from flask import request, jsonify
 import random
@@ -47,8 +51,15 @@ class AssignToken(Resource):
 			update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True, 'updated_on':datetime.datetime.now()})
 			db.session.commit()
 			return jsonify(token=token, status=200)
+		except DataError as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg="Data error")
+		except NoResultFound as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 		except Exception as e:
-			raise e
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 
 
 class UnassignToken(Resource):
@@ -62,8 +73,15 @@ class UnassignToken(Resource):
 			update_query = Token.query.filter_by(token_id = data['token_id']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
 			db.session.commit()
 			return jsonify(token=data, status=200)
+		except DataError as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg="Data error")
+		except NoResultFound as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 		except Exception as e:
-			raise e
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 
 class DeleteToken(Resource):
 	"""docstring for DeleteToken"""
@@ -76,8 +94,15 @@ class DeleteToken(Resource):
 			update_query = Token.query.filter_by(token_id = data['token_id']).update({'deleted':True})
 			db.session.commit()
 			return jsonify(token=data, status=200)
+		except DataError as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg="Data error")
+		except NoResultFound as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 		except Exception as e:
-			raise e
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 
 class RefreshToken(Resource):
 	"""docstring for RefreshToken"""
@@ -90,5 +115,12 @@ class RefreshToken(Resource):
 			update_query = Token.query.filter_by(token_id = data['token_id']).update({'updated_on':datetime.datetime.now()})
 			db.session.commit()
 			return jsonify(token=data, status=200)
+		except DataError as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg="Data error")
+		except NoResultFound as e:
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
 		except Exception as e:
-			raise e
+			logger.exception(str(e))
+			return self.return_json(status=400, msg=str(e))
