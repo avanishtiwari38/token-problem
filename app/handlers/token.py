@@ -1,6 +1,8 @@
 import logging
 import datetime
 import time
+import random
+import string
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import DataError
@@ -8,8 +10,7 @@ from marshmallow import ValidationError
 
 from flask_restful import Resource
 from flask import request, jsonify
-import random
-import string
+
 from app.models.token_model import Token, TokenSchema
 from app.models import *
 # from app.config import Config
@@ -53,13 +54,13 @@ class AssignToken(Resource):
 			return jsonify(token=token, status=200)
 		except DataError as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg="Data error")
+			return jsonify(status=400, msg="Data error")
 		except NoResultFound as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 		except Exception as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 
 
 class UnassignToken(Resource):
@@ -75,13 +76,13 @@ class UnassignToken(Resource):
 			return jsonify(token=data, status=200)
 		except DataError as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg="Data error")
+			return jsonify(status=400, msg="Data error")
 		except NoResultFound as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 		except Exception as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 
 class DeleteToken(Resource):
 	"""docstring for DeleteToken"""
@@ -96,13 +97,13 @@ class DeleteToken(Resource):
 			return jsonify(token=data, status=200)
 		except DataError as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg="Data error")
+			return jsonify(status=400, msg="Data error")
 		except NoResultFound as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 		except Exception as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 
 class RefreshToken(Resource):
 	"""docstring for RefreshToken"""
@@ -117,10 +118,10 @@ class RefreshToken(Resource):
 			return jsonify(token=data, status=200)
 		except DataError as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg="Data error")
+			return jsonify(status=400, msg="Data error")
 		except NoResultFound as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))
 		except Exception as e:
 			logger.exception(str(e))
-			return self.return_json(status=400, msg=str(e))
+			return jsonify(status=400, msg=str(e))

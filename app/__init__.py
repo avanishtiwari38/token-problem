@@ -6,8 +6,8 @@ from flask import Flask
 from flask_restful import Api
 from flask import Blueprint
 
-# from app.config.celery_config import make_celery, Config
-from app.config.local_config import Config
+from app.config.celery_config import make_celery, Config
+# from app.config.local_config import Config
 from .models import *
 
 dictConfig({
@@ -57,8 +57,8 @@ api.init_app(api_bp)
 # initialise flask migrations
 migrate.init_app(flask_app, db)
 
-# # initilise celery
-# celery_obj = make_celery(flask_app)
+# initilise celery
+celery_obj = make_celery(flask_app)
 
 # initialise cors
 # CORS(flask_app)
