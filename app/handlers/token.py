@@ -13,7 +13,7 @@ from flask import request, jsonify
 
 from app.models.token_model import Token, TokenSchema
 from app.models import *
-# from app.config import Config
+from app.tasks.tasks import check_five_min, check_one_min
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +26,14 @@ class NewToken(Resource):
 				token = self.randomString()
 				data = {}
 				data['token'] = token
-				data = TokenSchema().load(data).data 
+				dataSchema = TokenSchema().load(data).data 
 				token_pool.append(token)
 
-				db.session.add(data)
+				db.session.add(dataSchema)
 				db.session.commit()
 				db.session.close()
+
+				check_five_min.s(data).apply_async(countdown=5*60)
 			return jsonify(data=token_pool, status=200)
 		except Exception as e:
 			raise e
@@ -51,6 +53,8 @@ class AssignToken(Resource):
 			token = random.choice(data)
 			update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True, 'updated_on':datetime.datetime.now()})
 			db.session.commit()
+			check_one_min.s(token).apply_async(countdown=60)
+			check_five_min.s(token).apply_async(countdown=5*60)
 			return jsonify(token=token, status=200)
 		except DataError as e:
 			logger.exception(str(e))
@@ -69,11 +73,15 @@ class UnassignToken(Resource):
 		try:
 			request_data = request.get_json()
 			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
-			query = Token.query.filter_by(token = request_data['token']).one()
+			query = Token.query.filter_by(token = request_data['token']).one_or_none()
 			data = TokenSchema().dump(query).data
-			update_query = Token.query.filter_by(token_id = data['token_id']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
-			db.session.commit()
-			return jsonify(token=data, status=200)
+			if data:
+				update_query = Token.query.filter_by(token_id = data['token_id']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
+				db.session.commit()
+				check_five_min.s(data).apply_async(countdown=5*60)
+				return jsonify(token=data, status=200)
+			else:
+				return jsonify(msg="Token not found or deleted", status = 400)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
@@ -90,11 +98,14 @@ class DeleteToken(Resource):
 		try:
 			request_data = request.get_json()
 			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
-			query = Token.query.filter_by(token = request_data['token']).one()
+			query = Token.query.filter_by(token = request_data['token']).one_or_none()
 			data = TokenSchema().dump(query).data
-			update_query = Token.query.filter_by(token_id = data['token_id']).update({'deleted':True})
-			db.session.commit()
-			return jsonify(token=data, status=200)
+			if data:
+				update_query = Token.query.filter_by(token_id = data['token_id']).update({'deleted':True})
+				db.session.commit()
+				return jsonify(token=data, status=200)
+			else:
+				return jsonify(msg="Token not found", status=400)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
@@ -111,11 +122,16 @@ class RefreshToken(Resource):
 		try:
 			request_data = request.get_json()
 			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
-			query = Token.query.filter_by(token = request_data['token']).one()
+			query = Token.query.filter_by(token = request_data['token'], assigned = True).one_or_none()
 			data = TokenSchema().dump(query).data
-			update_query = Token.query.filter_by(token_id = data['token_id']).update({'updated_on':datetime.datetime.now()})
-			db.session.commit()
-			return jsonify(token=data, status=200)
+			if data:
+				update_query = Token.query.filter_by(token_id = data['token_id']).update({'updated_on':datetime.datetime.now()})
+				db.session.commit()
+				check_one_min.s(data).apply_async(countdown=60)
+				check_five_min.s(data).apply_async(countdown=5*60)
+				return jsonify(token=data, status=200)
+			else:
+				return jsonify(msg="token is not assigned or deleted", status=400)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")

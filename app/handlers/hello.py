@@ -10,7 +10,4 @@ logger = logging.getLogger(__name__)
 class Hello(Resource):
 	"""docstring for Hello"""
 	def get(self):
-		task = check_five_min.delay()
-		# check_one_min.delay()
-		print(task.state)
 		return "Hello"

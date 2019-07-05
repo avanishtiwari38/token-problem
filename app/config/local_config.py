@@ -4,7 +4,12 @@ from .base_config import BaseConfig
 class Config(BaseConfig):
     LOG_PATH = '/var/www/html/token_problem/token_problem/token_problem-app.log'
 
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:root@localhost/token_problem"
+    POSTGRES_USER = 'root'
+    POSTGRES_PASSWORD = 'root'
+    POSTGRES_HOST = 'localhost'
+    POSTGRES_DATABASE = 'token_problem'
+    # SQLALCHEMY_DATABASE_URI = "postgresql://root:root@localhost/token_problem"
+    SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}/{}".format(POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DATABASE)
     FLASK_DEBUG = True
     FLASK_ENV = "development"
 
