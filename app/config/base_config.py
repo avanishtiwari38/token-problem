@@ -11,6 +11,7 @@ class BaseConfig:
     celery_task_routes = {
     						'tasks.tasks.check_five_min': {'queue': 'check_five_min'},
     						'tasks.tasks.check_one_min': {'queue': 'check_one_min'},
+                            'tasks.tasks.default': {'queue': 'default'},
     					}
 
     task_queues = {

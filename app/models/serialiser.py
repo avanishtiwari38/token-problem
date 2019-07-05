@@ -20,6 +20,8 @@ class UnixTimeStamp(fields.Field):
 class BaseSchema(ma.ModelSchema):
     created_on = UnixTimeStamp()
     updated_on = UnixTimeStamp()
+    # created_on = fields.DateTime()
+    # updated_on = fields.DateTime()
 
     def load(self, data, many=None, partial=None):
         # used for now, since marshmallow doesnt raise ValidationError on its own. will be deprecated in future

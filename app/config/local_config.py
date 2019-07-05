@@ -12,4 +12,5 @@ class Config(BaseConfig):
     RABBITMQ_PORT = 5672
     RABBITMQ_USER = 'guest'
     RABBITMQ_PASSWORD = 'guest'
-    broker_url = "amqp://{}:{}@{}:{}//".format(RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_HOST, RABBITMQ_PORT)
+    broker_url = 'amqp://localhost//'
+    # broker_url = "amqp://{}:{}@{}:{}//".format(RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_HOST, RABBITMQ_PORT)
