@@ -36,7 +36,8 @@ class NewToken(Resource):
 				check_five_min.s(data).apply_async(countdown=5*60)
 			return jsonify(data=token_pool, status=200)
 		except Exception as e:
-			raise e
+			logger.exception(str(e))
+			return jsonify(status=400, msg=str(e))
 
 	def randomString(self, stringlength=10):
 		"""Generate a random string of fixed length """
@@ -72,7 +73,6 @@ class UnassignToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
 			query = Token.query.filter_by(token = request_data['token']).one_or_none()
 			data = TokenSchema().dump(query).data
 			if data:
@@ -97,7 +97,6 @@ class DeleteToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
 			query = Token.query.filter_by(token = request_data['token']).one_or_none()
 			data = TokenSchema().dump(query).data
 			if data:
@@ -121,7 +120,6 @@ class RefreshToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			# update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True})
 			query = Token.query.filter_by(token = request_data['token'], assigned = True).one_or_none()
 			data = TokenSchema().dump(query).data
 			if data:

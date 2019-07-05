@@ -2,12 +2,10 @@ import os
 from logging.config import dictConfig
 
 from flask import Flask
-# from flask_cors import CORS
 from flask_restful import Api
 from flask import Blueprint
 
 from app.config.celery_config import make_celery, Config
-# from app.config.local_config import Config
 from .models import *
 
 dictConfig({
@@ -60,8 +58,6 @@ migrate.init_app(flask_app, db)
 # initilise celery
 celery_obj = make_celery(flask_app)
 
-# initialise cors
-# CORS(flask_app)
 basedir = os.path.join(flask_app.root_path)
 # delibrately added in the end to avoid circular dependencies
 from app import urls

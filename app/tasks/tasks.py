@@ -3,8 +3,6 @@ import logging
 import datetime
 import time
 import copy
-# from datetime import datetime, time
-
 
 from sqlalchemy.orm.exc import NoResultFound
 from app import celery_obj

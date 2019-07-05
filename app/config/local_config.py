@@ -4,8 +4,8 @@ from .base_config import BaseConfig
 class Config(BaseConfig):
     LOG_PATH = '/var/www/html/token_problem/token_problem/token_problem-app.log'
 
-    POSTGRES_USER = 'root'
-    POSTGRES_PASSWORD = 'root'
+    POSTGRES_USER = ''
+    POSTGRES_PASSWORD = ''
     POSTGRES_HOST = 'localhost'
     POSTGRES_DATABASE = 'token_problem'
     # SQLALCHEMY_DATABASE_URI = "postgresql://root:root@localhost/token_problem"
@@ -15,7 +15,7 @@ class Config(BaseConfig):
 
     RABBITMQ_HOST = 'localhost'
     RABBITMQ_PORT = 5672
-    RABBITMQ_USER = 'guest'
-    RABBITMQ_PASSWORD = 'guest'
+    RABBITMQ_USER = ''
+    RABBITMQ_PASSWORD = ''
     broker_url = 'amqp://localhost//'
     # broker_url = "amqp://{}:{}@{}:{}//".format(RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_HOST, RABBITMQ_PORT)
