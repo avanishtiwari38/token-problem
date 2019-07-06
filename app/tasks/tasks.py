@@ -25,9 +25,7 @@ def check_five_min(data):
 		logger.info(time_diff)
 		logger.info(fiveminutes)
 		if (time_diff >= fiveminutes):
-			query = Token.query.filter_by(token = token).one()
-			dataDelete = TokenSchema().dump(query).data
-			update_query = Token.query.filter_by(token_id = dataDelete['token_id']).update({'deleted':True})
+			update_query = Token.query.filter_by(token = data['token']).update({'deleted':True})
 			db.session.commit()
 
 @celery_obj.task(queue='check_one_min')
@@ -43,7 +41,6 @@ def check_one_min(data):
 		logger.info(time_diff)
 		logger.info(oneminutes)
 		if (time_diff >= oneminutes):
-			query = Token.query.filter_by(token = token).one()
-			dataDelete = TokenSchema().dump(query).data
-			update_query = Token.query.filter_by(token_id = dataDelete['token_id']).update({'assigned':False})
+			update_query = Token.query.filter_by(token = data['token']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
 			db.session.commit()
+			check_five_min.s(data).apply_async(countdown=5*60)

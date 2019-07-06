@@ -55,8 +55,7 @@ class AssignToken(Resource):
 			update_query = Token.query.filter_by(token_id = token['token_id']).update({'assigned':True, 'updated_on':datetime.datetime.now()})
 			db.session.commit()
 			check_one_min.s(token).apply_async(countdown=60)
-			check_five_min.s(token).apply_async(countdown=5*60)
-			return jsonify(token=token, status=200)
+			return jsonify(msg="%s token has been assigned" % token['token'], status=200)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
@@ -73,15 +72,12 @@ class UnassignToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			query = Token.query.filter_by(token = request_data['token']).one_or_none()
-			data = TokenSchema().dump(query).data
-			if data:
-				update_query = Token.query.filter_by(token_id = data['token_id']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
-				db.session.commit()
-				check_five_min.s(data).apply_async(countdown=5*60)
-				return jsonify(token=data, status=200)
-			else:
-				return jsonify(msg="Token not found or deleted", status = 400)
+			update_query = Token.query.filter_by(token = request_data['token']).update({'assigned':False, 'updated_on':datetime.datetime.now()})
+			if not update_query:
+				return jsonify(msg="Token was not assigned or deleted", status= 400)
+			db.session.commit()
+			check_five_min.s(request_data).apply_async(countdown=5*60)
+			return jsonify(msg="%s token was unassigned" % request_data['token'], status=200)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
@@ -97,14 +93,11 @@ class DeleteToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			query = Token.query.filter_by(token = request_data['token']).one_or_none()
-			data = TokenSchema().dump(query).data
-			if data:
-				update_query = Token.query.filter_by(token_id = data['token_id']).update({'deleted':True})
-				db.session.commit()
-				return jsonify(token=data, status=200)
-			else:
-				return jsonify(msg="Token not found", status=400)
+			update_query = Token.query.filter_by(token = request_data['token']).update({'deleted':True})
+			if not update_query:
+				return jsonify(msg= "token not found or already deleted", status=400)
+			db.session.commit()
+			return jsonify(msg="%s token was deleted" % request_data['token'], status=200)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
@@ -120,16 +113,12 @@ class RefreshToken(Resource):
 	def post(self):
 		try:
 			request_data = request.get_json()
-			query = Token.query.filter_by(token = request_data['token'], assigned = True).one_or_none()
-			data = TokenSchema().dump(query).data
-			if data:
-				update_query = Token.query.filter_by(token_id = data['token_id']).update({'updated_on':datetime.datetime.now()})
-				db.session.commit()
-				check_one_min.s(data).apply_async(countdown=60)
-				check_five_min.s(data).apply_async(countdown=5*60)
-				return jsonify(token=data, status=200)
-			else:
+			update_query = Token.query.filter_by(token = request_data['token']).update({'updated_on':datetime.datetime.now()})
+			if not update_query:
 				return jsonify(msg="token is not assigned or deleted", status=400)
+			db.session.commit()
+			check_one_min.s(request_data).apply_async(countdown=60)
+			return jsonify(msg="%s Token has been refreshed" % request_data['token'], status=200)
 		except DataError as e:
 			logger.exception(str(e))
 			return jsonify(status=400, msg="Data error")
