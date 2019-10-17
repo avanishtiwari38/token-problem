@@ -16,7 +16,7 @@ Use the requirement files for each environment to install all the requirements i
 
 4.Edit config file as per your database.
     
-    cd inside the config folder
+    //cd inside the config folder
     cd config
     vim local_config.py
  
